@@ -25,7 +25,7 @@ public class RequestTypeServiceTest {
     RequestTypeRepository requestTypeRepository;
 
     @Test
-    public void testCreateRequest() throws ContactFormGeneralException {
+    public void correctName_create_success() throws ContactFormGeneralException {
         String typeName = "Type1";
         RequestTypeDto type = requestTypeService.createRequestType(typeName);
         RequestType testType = requestTypeRepository.getOne(type.getId());

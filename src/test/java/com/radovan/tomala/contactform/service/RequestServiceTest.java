@@ -37,7 +37,7 @@ public class RequestServiceTest {
 
 
     @Test
-    public void testCreateRequest() throws ContactFormGeneralException {
+    public void correctRequest_create_success() throws ContactFormGeneralException {
         RequestType requestType1 = new RequestType("Type1");
         Long typeId = entityManager.persistAndGetId(requestType1, Long.class);
         RequestDto requestDto = RequestDto.of(typeId,

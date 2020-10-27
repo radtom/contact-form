@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 @Slf4j
 public class RequestTypeService {
@@ -22,5 +25,10 @@ public class RequestTypeService {
         }
         log.error("Name cannot be blank");
         throw new ContactFormGeneralException("Name cannot be blank");
+    }
+
+    public List<RequestTypeDto> getAll(){
+        List<RequestType> requests = requestTypeRepository.findAll();
+        return requests.stream().map(RequestTypeDto::of).collect(Collectors.toList());
     }
 }
