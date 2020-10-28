@@ -4,6 +4,7 @@ import com.radovan.tomala.contactform.dto.RequestTypeDto;
 import com.radovan.tomala.contactform.entity.RequestType;
 import com.radovan.tomala.contactform.exception.ContactFormGeneralException;
 import com.radovan.tomala.contactform.repository.RequestTypeRepository;
+import com.radovan.tomala.contactform.service.impl.RequestTypeServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +16,8 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-@Import({RequestTypeService.class})
-public class RequestTypeServiceTest {
+@Import({RequestTypeServiceImpl.class})
+public class RequestTypeServiceImplTest {
 
     @Autowired
     RequestTypeService requestTypeService;

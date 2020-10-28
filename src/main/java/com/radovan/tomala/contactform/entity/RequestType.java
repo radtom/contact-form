@@ -19,16 +19,17 @@ public class RequestType {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(unique=true)
     private String name;
 
     @OneToMany(mappedBy = "requestType", cascade = CascadeType.ALL)
     List<Request> requests = new LinkedList<>();
 
-    public void addRequest(Request request){
-        requests.add(request);
-    }
-
     public RequestType(String name) {
         this.name = name;
+    }
+
+    public void addRequest(Request request){
+        requests.add(request);
     }
 }

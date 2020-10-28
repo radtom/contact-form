@@ -1,34 +1,29 @@
 package com.radovan.tomala.contactform.service;
 
 import com.radovan.tomala.contactform.dto.RequestTypeDto;
-import com.radovan.tomala.contactform.entity.RequestType;
 import com.radovan.tomala.contactform.exception.ContactFormGeneralException;
-import com.radovan.tomala.contactform.repository.RequestTypeRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Component
-@Slf4j
-public class RequestTypeService {
+/**
+ * Provides methods for RequestType manipulation
+ */
+public interface RequestTypeService {
 
-    @Autowired
-    RequestTypeRepository requestTypeRepository;
+    /**
+     * Creates new Request Type and saves it to database
+     *
+     * @param name name of new Request Type
+     * @return RequestTypeDto of created Request Type
+     * @throws ContactFormGeneralException when creation is not succesful
+     */
+    RequestTypeDto createRequestType(String name) throws ContactFormGeneralException;
 
-    public RequestTypeDto createRequestType(String name) throws ContactFormGeneralException {
-        if(name != null && !name.equals("")){
-            RequestType requestType = new RequestType(name);
-            return RequestTypeDto.of(requestTypeRepository.save(requestType));
-        }
-        log.error("Name cannot be blank");
-        throw new ContactFormGeneralException("Name cannot be blank");
-    }
+    /**
+     * Gets list of all Request Types from database
+     * @return List of all Request Types
+     */
+    List<RequestTypeDto> getAll();
 
-    public List<RequestTypeDto> getAll(){
-        List<RequestType> requests = requestTypeRepository.findAll();
-        return requests.stream().map(RequestTypeDto::of).collect(Collectors.toList());
-    }
+
 }
