@@ -1,7 +1,82 @@
 import React from 'react';
 import { RequestDto, RequestTypeDto } from './types';
 import axios from "axios";
+import styled from "@emotion/styled"
 
+const FormBody = styled.div`
+    margin: auto;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    width: 25%;
+`
+
+const Title = styled.h1`
+    text-align:center;
+    font-family: Arial;
+`
+
+const InputWrapper = styled.div`
+    padding-top: 15px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+`
+
+const TextAreaWrapper = styled.div`
+    width: 100%;
+    padding-top: 15px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+`
+
+const TextArea = styled.textarea`
+    resize: vertical;
+`
+
+const Label = styled.label`
+    font-family: Arial;
+    padding-bottom: 10px;
+    font-size: 14px;
+`
+
+const CharCounter = styled.p`
+    color: grey;
+    position: relative;
+    top: -30px;
+    right: 5%;
+    margin-left: auto;
+    font-family: Arial;
+    margin-bottom: 0;
+    font-size: 12px;
+`
+
+const Error = styled.p`
+    padding-top: 2px;
+    margin: 0;
+    color: red;
+`
+
+const Success = styled.p`
+    padding-top: 2px;
+    margin: 0;
+    color: green;
+`
+
+const Button = styled.button`
+    background-color: #0099cc;
+    color: white;
+    width: 50%;
+    height: 40px;
+    margin-left: auto;
+    margin-top: -10px;
+    font-size: 14px;
+    border: none; 
+    border-radius: 9px;
+    font-family: Arial;
+`
 
 interface State {
     requestType: number;
@@ -10,17 +85,36 @@ interface State {
     surname: string;
     body: string;
     selectOptions: RequestTypeDto[]
+    policyBlankError: boolean;
+    policyFormatError: boolean;
+    nameBlankError: boolean;
+    nameFormatError: boolean;
+    surnameBlankError: boolean;
+    surnameFormatError: boolean;
+    bodyBlankError: boolean;
+    successMessage: boolean;
+    errorMessage: boolean;
+
 }
 
 export default class ContactForm extends React.Component<{}, State> {
 
     state = {
-        requestType: 0,
+        requestType: 1,
         policyNumber: "",
         name: "",
         surname: "",
         body: "",
         selectOptions: [] as RequestTypeDto[],
+        policyBlankError: false,
+        policyFormatError: false,
+        nameBlankError: false,
+        nameFormatError: false,
+        surnameBlankError: false,
+        surnameFormatError: false,
+        bodyBlankError: false,
+        successMessage: false,
+        errorMessage: false,
     }
 
     render(){
@@ -31,21 +125,74 @@ export default class ContactForm extends React.Component<{}, State> {
             name,
             surname,
             body,
-            selectOptions
+            selectOptions,
+            policyBlankError,
+            policyFormatError,
+            nameBlankError,
+            nameFormatError,
+            surnameBlankError,
+            surnameFormatError,
+            bodyBlankError,
+            successMessage,
+            errorMessage,
         } = this.state
 
-        return(<div>
-            <h1>Contact Us</h1>
-            <select onChange={this.handleSelect} value={requestType}>
-                {selectOptions.map(option => 
-                    {return <option value={option.id}>{option.name}</option>} )}
-            </select>
-            <input type="text" name="policy" value={policyNumber} onChange={this.handlePolicyChange}/>
-            <input type="text" name="name" value={name} onChange={this.handleNameChange}/>
-            <input type="text" name="surname" value={surname} onChange={this.handleSurnameChange}/>
-            <textarea value={body} onChange={this.handleBodyChange} maxLength={5000}/>
-            <button onClick={this.handleSubmit}>Send Request</button>
-        </div>)
+        return(
+        <FormBody>
+            <Title>Contact us</Title>
+            {successMessage && 
+                <Success>Request submitted successfully</Success>
+            }
+            {errorMessage &&
+                <Error>Something went wrong</Error>
+            }
+            <InputWrapper>
+                <Label>Kind of Request</Label>
+                <select onChange={this.handleSelect} value={requestType}>
+                    {selectOptions.map(option => 
+                        {return <option value={option.id}>{option.name}</option>} )}
+                </select>
+            </InputWrapper>
+            <InputWrapper>
+                <Label>Policy Number</Label>
+                <input type="text" name="policy" value={policyNumber} onChange={this.handlePolicyChange}/>
+                {policyBlankError &&
+                    <Error>Policy Number cannot be blank</Error>
+                }
+                {policyFormatError &&
+                    <Error>Policy can only contain letters and numbers</Error>
+                }
+            </InputWrapper>
+            <InputWrapper>
+                <Label>Name</Label>
+                <input type="text" name="name" value={name} onChange={this.handleNameChange}/>
+                {nameBlankError &&
+                    <Error>Name cannot be blank</Error>
+                }
+                {nameFormatError &&
+                    <Error>Name can only contain letters</Error>
+                }
+            </InputWrapper>
+            <InputWrapper>
+                <Label>Surname</Label>
+                <input type="text" name="surname" value={surname} onChange={this.handleSurnameChange}/>
+                {surnameBlankError &&
+                    <Error>Surname cannot be blank</Error>
+                }
+                {surnameFormatError &&
+                    <Error>Surname can only contain letters</Error>
+                }
+            </InputWrapper>
+            <TextAreaWrapper>
+                <Label>Your Request</Label>
+                <TextArea value={body} onChange={this.handleBodyChange} maxLength={5000} rows={10}/>
+                <CharCounter>{body.length}/5000</CharCounter>
+                {bodyBlankError &&
+                    <Error>Request body cannot be blank</Error>
+                }
+            </TextAreaWrapper>
+            <Button onClick={this.handleSubmit}>SEND REQUEST</Button>
+        </FormBody>)
     }
 
     componentDidMount(){
@@ -92,42 +239,59 @@ export default class ContactForm extends React.Component<{}, State> {
                 body: this.state.body
             }
             axios.post("/rest/request/", data)
-                .then(response => console.log(response))
-                .catch(error => console.log(error))
+                .then(response => {
+                    this.setState({
+                        requestType: 1,
+                        policyNumber: "",
+                        name: "",
+                        surname: "",
+                        body: "",
+                        successMessage: true,
+                    })
+                })
+                .catch(error => this.setState({errorMessage: true}))
         }
     }
 
     validateState = () => {
+        let ret = true;
         if(this.state.policyNumber === ""){
-            console.log("Policy number cannot be empty")
-            return false;
+            this.setState({policyBlankError: true})
+            ret = false;
         }
+        else this.setState({policyBlankError: false})
         var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
         if(format.test(this.state.policyNumber)){
-            console.log("Policy number can contain only numbers and letters")
-            return false;
+            this.setState({policyFormatError: true})
+            ret = false;
         }
+        else this.setState({policyFormatError: false})
         if(this.state.name === ""){
-            console.log("Name cannot be empty")
-            return false;
+            this.setState({nameBlankError: true})
+            ret = false;
         }
+        else this.setState({nameBlankError: false})
         if(this.state.surname === ""){
-            console.log("Surname cannot be empty")
-             return false;
-            }
+            this.setState({surnameBlankError: true})
+             ret = false;
+        }
+        else this.setState({surnameBlankError: false})
         if(!/^[a-zA-Z]+$/.test(this.state.name)) {
-            console.log("Name can only contain letters")
-            return false;
+            this.setState({nameFormatError: true})
+            ret = false;
         }
+        else this.setState({nameFormatError: false})
         if(!/^[a-zA-Z]+$/.test(this.state.surname)) {
-            console.log("Surname can only contain letters")
-            return false;
+            this.setState({surnameFormatError: true})
+            ret = false;
         }
+        else this.setState({surnameFormatError: false})
         if(this.state.body === "") {
-            console.log("Body cannot be empty")
-            return false;
+            this.setState({bodyBlankError: true})
+            ret = false;
         }
-        return true;
+        else this.setState({bodyBlankError: false})
+        return ret;
     }
 
 }
